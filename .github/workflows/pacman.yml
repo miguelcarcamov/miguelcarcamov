@@ -2,29 +2,31 @@ name: Generate Pac-Man Contribution Graph
  
 on:
   schedule:
-    # Runs every 6 hours
-    - cron: "0 */6 * * *"
+    # Run automatically every 24 hours
+    - cron: "0 0 * * *"
   workflow_dispatch:
   push:
     branches:
       - main
+ 
+env:
+  # Opt in to Node.js 24 now. After June 2, 2026, this becomes the default and
+  # the line can be removed.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
  
 jobs:
   generate:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    timeout-minutes: 5
     steps:
-      - name: Generate Pac-Man contribution graph
+      - name: Generate pacman-contribution-graph.svg
         uses: abozanona/pacman-contribution-graph@main
         with:
           github_user_name: ${{ github.repository_owner }}
-          outputs: |
-            dist/pacman-contribution-graph.svg
-            dist/pacman-contribution-graph-dark.svg?color_snake=yellow&color_dots=#1f6feb,#388bfd,#58a6ff,#79c0ff,#a5d6ff
-            dist/pacman-contribution-graph.gif
  
-      - name: Push to output branch
+      - name: Push SVGs to the output branch
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
           target_branch: output
